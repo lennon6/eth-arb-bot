@@ -88,12 +88,12 @@ def execute_trade():
         receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
         
         if receipt.status == 1:
-            print(f"✅ Success! Gas used: {receipt.gasUsed}")
+            print(f"Success! Gas used: {receipt.gasUsed}")
         else:
-            print(f"❌ Transaction reverted")
+            print(f"Transaction reverted")
             
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f" Error: {e}")
 
 def main():
     while True:

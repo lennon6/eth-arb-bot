@@ -32,30 +32,68 @@ arb_contract = w3.eth.contract(address=config.ARBITRAGE_CONTRACT, abi=ARBITRAGE_
 
 AMOUNT_IN_WEI = w3.toWei(config.AMOUNT_IN_ETH, "ether")
 
+def get_dynamic_gas_price():
+    """Get current gas price with a small buffer."""
+    try:
+        base_fee = w3.eth.gas_price
+        max_priority_fee = w3.toWei("2", "gwei")
+        max_fee = int(base_fee * 1.1) + max_priority_fee
+        return max_priority_fee, max_fee
+    except Exception as e:
+        print(f"Error getting gas price: {e}")
+        return w3.toWei("2", "gwei"), w3.toWei("100", "gwei")
+
 def check_arbitrage():
     rU0, rU1, _, _ = utils.get_reserves(pair_uni)
     rS0, rS1, _, _ = utils.get_reserves(pair_sushi)
 
     tokens_bought = utils.get_amount_out(AMOUNT_IN_WEI, rU0, rU1, config.FEE_RATE)
     eth_back = utils.get_amount_out(tokens_bought, rS1, rS0, config.FEE_RATE)
-
-    profit = eth_back - AMOUNT_IN_WEI
-    print(f"Profit estimate: {utils.wei_to_eth(w3, profit)} ETH")
-    return profit > w3.toWei(config.MIN_PROFIT_ETH, "ether")
+    profit_1 = eth_back - AMOUNT_IN_WEI
+    
+    tokens_bought_2 = utils.get_amount_out(AMOUNT_IN_WEI, rS0, rS1, config.FEE_RATE)
+    eth_back_2 = utils.get_amount_out(tokens_bought_2, rU1, rU0, config.FEE_RATE)
+    profit_2 = eth_back_2 - AMOUNT_IN_WEI
+    
+    min_profit_wei = w3.toWei(config.MIN_PROFIT_ETH, "ether")
+    
+    if profit_1 > min_profit_wei:
+        print(f"✓ Uni->Sushi profit: {utils.wei_to_eth(w3, profit_1)} ETH")
+        return True
+    elif profit_2 > min_profit_wei:
+        print(f"✓ Sushi->Uni profit: {utils.wei_to_eth(w3, profit_2)} ETH")
+        return True
+    else:
+        print(f"✗ No profit")
+        return False
 
 def execute_trade():
-    nonce = w3.eth.get_transaction_count(ADDRESS)
-    tx = arb_contract.functions.swap(AMOUNT_IN_WEI).buildTransaction({
-        "from": ADDRESS,
-        "nonce": nonce,
-        "gas": 800000,
-        "maxPriorityFeePerGas": w3.toWei("2", "gwei"),
-        "maxFeePerGas": w3.toWei("120", "gwei"),
-        "chainId": config.CHAIN_ID
-    })
-    signed = acct.sign_transaction(tx)
-    tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
-    print("Trade submitted:", tx_hash.hex())
+    try:
+        max_priority_fee, max_fee = get_dynamic_gas_price()
+        nonce = w3.eth.get_transaction_count(ADDRESS)
+        
+        tx = arb_contract.functions.swap(AMOUNT_IN_WEI).buildTransaction({
+            "from": ADDRESS,
+            "nonce": nonce,
+            "gas": 800000,
+            "maxPriorityFeePerGas": max_priority_fee,
+            "maxFeePerGas": max_fee,
+            "chainId": config.CHAIN_ID
+        })
+        
+        signed = acct.sign_transaction(tx)
+        tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
+        print(f"Trade submitted: {tx_hash.hex()}")
+        
+        receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+        
+        if receipt.status == 1:
+            print(f"✅ Success! Gas used: {receipt.gasUsed}")
+        else:
+            print(f"❌ Transaction reverted")
+            
+    except Exception as e:
+        print(f"❌ Error: {e}")
 
 def main():
     while True:

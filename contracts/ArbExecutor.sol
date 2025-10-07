@@ -4,6 +4,13 @@ pragma solidity ^0.8.0;
 import "./interfaces/IUniswapV2Router.sol";
 import "./interfaces/ISushiSwapRouter.sol";
 
+interface IERC20 {
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transfer(address to, uint256 amount) external returns (bool);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
+    function balanceOf(address account) external view returns (uint256);
+}
+
 interface IWETH9 {
     function deposit() external payable;
     function withdraw(uint256 wad) external;
@@ -31,7 +38,7 @@ contract ArbitrageExecutor {
         IWETH9(WETH_ADDRESS).transferFrom(msg.sender, address(this), _amountIn);
         IWETH9(WETH_ADDRESS).approve(UNISWAP_ROUTER_ADDRESS, _amountIn);
 
-        address ;
+        address[] memory path = new address[](2);
         path[0] = WETH_ADDRESS;
         path[1] = UNI_TOKEN;
 
@@ -44,7 +51,7 @@ contract ArbitrageExecutor {
         );
         uint256 amountOut = amounts[1];
 
-        IWETH9(UNI_TOKEN).approve(SUSHISWAP_ROUTER_ADDRESS, amountOut);
+        IERC20(UNI_TOKEN).approve(SUSHISWAP_ROUTER_ADDRESS, amountOut);
 
         path[0] = UNI_TOKEN;
         path[1] = WETH_ADDRESS;

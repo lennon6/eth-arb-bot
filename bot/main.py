@@ -58,13 +58,13 @@ def check_arbitrage():
     min_profit_wei = w3.toWei(config.MIN_PROFIT_ETH, "ether")
     
     if profit_1 > min_profit_wei:
-        print(f"✓ Uni->Sushi profit: {utils.wei_to_eth(w3, profit_1)} ETH")
+        print(f"Uni->Sushi profit: {utils.wei_to_eth(w3, profit_1)} ETH")
         return True
     elif profit_2 > min_profit_wei:
-        print(f"✓ Sushi->Uni profit: {utils.wei_to_eth(w3, profit_2)} ETH")
+        print(f"Sushi->Uni profit: {utils.wei_to_eth(w3, profit_2)} ETH")
         return True
     else:
-        print(f"✗ No profit")
+        print(f"No profit")
         return False
 
 def execute_trade():

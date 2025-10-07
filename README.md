@@ -104,7 +104,3 @@ The bot will run continuously, monitoring for arbitrage opportunities and execut
 ## License
 
 MIT
-
-## Disclaimer
-
-This software is for educational purposes only. Use at your own risk. The developers are not responsible for any financial losses incurred while using this bot. Always do your own research and understand the risks involved in decentralized finance and arbitrage trading.

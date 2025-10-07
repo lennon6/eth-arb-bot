@@ -1,16 +1,17 @@
 # ETH Arbitrage Bot
 
-A high-frequency trading bot that identifies and executes profitable arbitrage opportunities between Uniswap V2 and SushiSwap DEXs on the Ethereum network.
+A trading bot that identifies and executes profitable arbitrage opportunities between Uniswap V2 and SushiSwap DEXs on the Ethereum network.
 
-## Overview
+## Disclaimer
 
-This bot monitors price differences for token pairs between Uniswap V2 and SushiSwap decentralized exchanges. When it detects a profitable arbitrage opportunity (after accounting for gas fees), it automatically executes trades to capture the price difference.
+This bot is for educational purposes only. Please do not risk money you are afraid to lose. 
 
-The bot operates by:
-1. Monitoring token reserves on both DEXs in real-time
-2. Calculating potential profits from price discrepancies
-3. Executing trades when the profit exceeds the configured minimum threshold
-4. Handling all transactions through a smart contract for optimal execution
+- Never share your private keys
+- Start with small trade amounts to test
+- Monitor gas prices as they can significantly impact profitability
+- The contract executes trades atomically to prevent partial execution
+- Test on a testnet (Goerli, Sepolia) before using on mainnet
+- NFA. DYOR.
 
 ## Features
 
@@ -93,36 +94,12 @@ python bot/main.py
 
 The bot will run continuously, monitoring for arbitrage opportunities and executing trades when profitable.
 
-## Project Structure
-
-```
-eth-arb-bot/
-├── bot/
-│   ├── main.py          # Main bot logic
-│   ├── utils.py         # Utility functions for calculations
-│   ├── config.py        # Configuration loader
-│   └── requirements.txt # Python dependencies
-├── contracts/
-│   └── ArbExecutor.sol  # Smart contract for arbitrage execution
-├── scripts/
-│   └── deploy_contract.py  # Contract deployment script
-└── .env                 # Environment configuration
-```
-
 ## How It Works
 
 1. **Monitoring**: The bot continuously polls Uniswap V2 and SushiSwap pair contracts to get current reserves
 2. **Calculation**: Uses the constant product formula (x * y = k) to calculate expected output amounts
 3. **Profit Check**: Compares the final ETH amount after both swaps against the initial amount plus minimum profit threshold
 4. **Execution**: When profitable, calls the `swap()` function on the deployed smart contract which executes both trades atomically
-
-## Security Considerations
-
-- **Never share your private key**
-- Start with small trade amounts to test
-- Monitor gas prices as they can significantly impact profitability
-- The contract executes trades atomically to prevent partial execution
-- Test on a testnet (Goerli, Sepolia) before using on mainnet
 
 ## License
 

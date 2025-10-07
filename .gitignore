@@ -1,0 +1,36 @@
+# Node/Hardhat artifacts
+node_modules/
+artifacts/
+cache/
+typechain/
+coverage/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# dotenv / secrets
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+debug.log
+
+# MacOS system files
+.DS_Store
+
+# IDE/editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace

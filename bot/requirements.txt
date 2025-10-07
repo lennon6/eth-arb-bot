@@ -1,3 +1,4 @@
 web3
 python-dotenv
 eth-account
+py-solc-x
